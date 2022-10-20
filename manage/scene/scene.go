@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
-	"log"
 	"time"
 )
 
@@ -32,9 +31,10 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 	switch event.(type) {
 	case *sdl.QuitEvent:
 		return true
-	case *sdl.MouseMotionEvent, *sdl.WindowEvent, *sdl.TouchFingerEvent, *sdl.CommonEvent:
+	case *sdl.MouseButtonEvent:
+		s.birdEntity.Jump()
 	default:
-		log.Printf("unknown event %T", event)
+
 	}
 	return false
 }

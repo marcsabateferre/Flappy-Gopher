@@ -12,7 +12,7 @@ var gravity = 0.1
 type Bird struct {
 	x        int32
 	y        int32
-	time     int
+	frame    int
 	width    int32
 	height   int32
 	speed    float64
@@ -43,7 +43,7 @@ func (b *Bird) Paint(r *sdl.Renderer) error {
 
 	rect := &sdl.Rect{X: 10, Y: 600 - b.y - b.height/2, W: b.width, H: b.height}
 
-	i := b.time / 10 % len(b.textures)
+	i := b.frame / 10 % len(b.textures)
 	if error := r.Copy(b.textures[i], nil, rect); error != nil {
 		return fmt.Errorf("could not copy background: %v", error)
 	}
@@ -51,9 +51,12 @@ func (b *Bird) Paint(r *sdl.Renderer) error {
 }
 
 func (b *Bird) UpdateBird() {
-	b.time++
+	b.frame++
 	b.y -= int32(b.speed)
 	if b.y < 0 {
+		b.dead = true
+	}
+	if b.y > 600 {
 		b.dead = true
 	}
 	b.speed += gravity
@@ -67,4 +70,8 @@ func (b *Bird) RestartBird() {
 	b.y = 300
 	b.speed = 0
 	b.dead = false
+}
+
+func (b *Bird) Jump() {
+	b.speed = -5
 }
