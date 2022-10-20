@@ -1,6 +1,7 @@
 package scene
 
 import (
+	"app/entity"
 	"fmt"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
@@ -9,7 +10,8 @@ import (
 )
 
 type scene struct {
-	bg *sdl.Texture
+	bg         *sdl.Texture
+	birdEntity *entity.Bird
 }
 
 func NewScene(r *sdl.Renderer) (*scene, error) {
@@ -17,8 +19,13 @@ func NewScene(r *sdl.Renderer) (*scene, error) {
 	if error != nil {
 		return nil, fmt.Errorf("could not load background image: %v", error)
 	}
+	var bird *entity.Bird
 
-	return &scene{bg: bg}, nil
+	bird, error = entity.CreateBird(r)
+	if error != nil {
+		return nil, error
+	}
+	return &scene{bg: bg, birdEntity: bird}, nil
 }
 
 func (s *scene) handleEvent(event sdl.Event) bool {
@@ -60,6 +67,10 @@ func (s *scene) paint(r *sdl.Renderer) error {
 	if error := r.Copy(s.bg, nil, nil); error != nil {
 		return fmt.Errorf("could not copy background: %v", error)
 	}
+	if error := s.birdEntity.Paint(r); error != nil {
+		return error
+	}
+
 	r.Present()
 	return nil
 }
