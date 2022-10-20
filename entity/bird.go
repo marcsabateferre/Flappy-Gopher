@@ -26,7 +26,7 @@ func CreateBird(r *sdl.Renderer) (*Bird, error) {
 		var image = "resources/png/frame-" + strconv.Itoa(i) + ".png"
 		texture, error := img.LoadTexture(r, image)
 		if error != nil {
-			return nil, fmt.Errorf("could not load background image: %v", error)
+			return nil, fmt.Errorf("could not load bird image: %v", error)
 		}
 		textures = append(textures, texture)
 	}
@@ -67,9 +67,12 @@ func (b *Bird) IsDead() bool {
 }
 
 func (b *Bird) RestartBird() {
-	b.y = 300
-	b.speed = 0
-	b.dead = false
+	if b.dead {
+		b.y = 300
+		b.speed = 0
+		b.dead = false
+		b.UpdateBird()
+	}
 }
 
 func (b *Bird) Jump() {

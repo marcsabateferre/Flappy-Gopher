@@ -11,20 +11,27 @@ import (
 type scene struct {
 	bg         *sdl.Texture
 	birdEntity *entity.Bird
+	pipeEntity *entity.Pipe
 }
 
-func NewScene(r *sdl.Renderer) (*scene, error) {
+func CreateScene(r *sdl.Renderer) (*scene, error) {
 	bg, error := img.LoadTexture(r, "resources/png/bg.png")
 	if error != nil {
 		return nil, fmt.Errorf("could not load background image: %v", error)
 	}
 	var bird *entity.Bird
+	var pipe *entity.Pipe
 
 	bird, error = entity.CreateBird(r)
 	if error != nil {
 		return nil, error
 	}
-	return &scene{bg: bg, birdEntity: bird}, nil
+
+	pipe, error = entity.CreatePipe(r)
+	if error != nil {
+		return nil, error
+	}
+	return &scene{bg: bg, birdEntity: bird, pipeEntity: pipe}, nil
 }
 
 func (s *scene) handleEvent(event sdl.Event) bool {
@@ -53,11 +60,7 @@ func (s *scene) Run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 				}
 			case <-tick:
 				s.updateScene()
-
-				if s.birdEntity.IsDead() {
-					s.birdEntity.RestartBird()
-					s.birdEntity.UpdateBird()
-				}
+				s.birdEntity.RestartBird()
 				if err := s.paint(r); err != nil {
 					errc <- err
 				}
@@ -73,7 +76,12 @@ func (s *scene) paint(r *sdl.Renderer) error {
 	if error := r.Copy(s.bg, nil, nil); error != nil {
 		return fmt.Errorf("could not copy background: %v", error)
 	}
+
 	if error := s.birdEntity.Paint(r); error != nil {
+		return error
+	}
+
+	if error := s.pipeEntity.Paint(r); error != nil {
 		return error
 	}
 
