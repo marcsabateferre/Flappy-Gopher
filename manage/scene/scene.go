@@ -52,6 +52,12 @@ func (s *scene) Run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 					return
 				}
 			case <-tick:
+				s.updateScene()
+
+				if s.birdEntity.IsDead() {
+					s.birdEntity.RestartBird()
+					s.birdEntity.UpdateBird()
+				}
 				if err := s.paint(r); err != nil {
 					errc <- err
 				}
@@ -77,4 +83,8 @@ func (s *scene) paint(r *sdl.Renderer) error {
 
 func (s *scene) Destroy() {
 	s.bg.Destroy()
+}
+
+func (s *scene) updateScene() {
+	s.birdEntity.UpdateBird()
 }

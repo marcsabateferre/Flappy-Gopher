@@ -7,6 +7,8 @@ import (
 	"strconv"
 )
 
+var gravity = 0.1
+
 type Bird struct {
 	x        int32
 	y        int32
@@ -46,4 +48,23 @@ func (b *Bird) Paint(r *sdl.Renderer) error {
 		return fmt.Errorf("could not copy background: %v", error)
 	}
 	return nil
+}
+
+func (b *Bird) UpdateBird() {
+	b.time++
+	b.y -= int32(b.speed)
+	if b.y < 0 {
+		b.dead = true
+	}
+	b.speed += gravity
+}
+
+func (b *Bird) IsDead() bool {
+	return b.dead
+}
+
+func (b *Bird) RestartBird() {
+	b.y = 300
+	b.speed = 0
+	b.dead = false
 }
