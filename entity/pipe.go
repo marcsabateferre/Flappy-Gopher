@@ -107,17 +107,16 @@ func (pipes *Pipes) CheckCollisions(bird *Bird) {
 
 func (pipe *Pipe) checkCollision(bird *Bird) {
 	if bird.x > pipe.x && bird.x < pipe.width+bird.width {
-		//Bird passes the pipe
-
+		//Bird passes the pipe, TODO: fix the quantity of value to sum, check timer
+		//bird.points += 1
 	}
 	if bird.x > pipe.x && pipe.x < bird.width {
-		//TODO: fix the vertical checking
-		if !pipe.rotated && bird.y < pipe.height {
-			//bird.dead = true
+		if !pipe.rotated && (bird.y+bird.height) < pipe.height {
+			bird.dead = true
 		}
 
-		if pipe.rotated && bird.y > pipe.height {
-			//bird.dead = true
+		if pipe.rotated && (600-pipe.height) < bird.y+(bird.height/2) {
+			bird.dead = true
 		}
 
 	}
