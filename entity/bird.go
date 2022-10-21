@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	"strconv"
 )
 
@@ -18,6 +19,7 @@ type Bird struct {
 	speed    float64
 	dead     bool
 	textures []*sdl.Texture
+	points   int
 }
 
 func CreateBird(r *sdl.Renderer) (*Bird, error) {
@@ -26,7 +28,7 @@ func CreateBird(r *sdl.Renderer) (*Bird, error) {
 		var image = "resources/png/frame-" + strconv.Itoa(i) + ".png"
 		texture, error := img.LoadTexture(r, image)
 		if error != nil {
-			return nil, fmt.Errorf("could not load bird image: %v", error)
+			return nil, fmt.Errorf("could not load bird image: %s", error)
 		}
 		textures = append(textures, texture)
 	}
@@ -36,6 +38,7 @@ func CreateBird(r *sdl.Renderer) (*Bird, error) {
 		x:        10,
 		y:        300,
 		width:    50,
+		points:   0,
 		height:   43}, nil
 }
 
@@ -45,7 +48,7 @@ func (b *Bird) Paint(r *sdl.Renderer) error {
 
 	i := b.frame / 10 % len(b.textures)
 	if error := r.Copy(b.textures[i], nil, rect); error != nil {
-		return fmt.Errorf("could not copy background: %v", error)
+		return fmt.Errorf("could not copy background: %s", error)
 	}
 	return nil
 }
@@ -71,6 +74,7 @@ func (b *Bird) RestartBird() bool {
 		b.y = 300
 		b.speed = 0
 		b.dead = false
+		b.points = 0
 		b.UpdateBird()
 		return true
 	}
@@ -80,4 +84,39 @@ func (b *Bird) RestartBird() bool {
 
 func (b *Bird) Jump() {
 	b.speed = -5
+}
+func (bird *Bird) PaintPoints(r *sdl.Renderer) error {
+	f, err := ttf.OpenFont("resources/fonts/OpenSans-Bold.ttf", 10)
+	if err != nil {
+		return fmt.Errorf("could not load font: %s", err)
+	}
+	defer f.Close()
+
+	c := sdl.Color{R: 0, G: 0, B: 0, A: 255}
+	var pointsTotal = bird.points
+	s, err := f.RenderUTF8Solid("Points: "+strconv.Itoa(pointsTotal), c)
+	if err != nil {
+		return fmt.Errorf("could not render points text: %s", err)
+	}
+	defer s.Free()
+
+	t, err := r.CreateTextureFromSurface(s)
+	if err != nil {
+		return fmt.Errorf("could not render texture: %s", err)
+	}
+	defer t.Destroy()
+	rect := &sdl.Rect{X: 280, Y: 500, W: 200, H: 100}
+	if err := r.Copy(t, nil, rect); err != nil {
+		return fmt.Errorf("could not copy texture: %s", err)
+	}
+
+	return nil
+}
+
+func (bird *Bird) updatePoints() {
+	if bird.IsDead() {
+		bird.points = 0
+	}
+
+	bird.points += 1
 }

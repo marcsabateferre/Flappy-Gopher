@@ -58,35 +58,35 @@ func (pipes *Pipes) Paint(r *sdl.Renderer) error {
 	return nil
 }
 
-func (p *Pipe) paint(r *sdl.Renderer) error {
-
-	rect := &sdl.Rect{X: p.x, Y: 600 - p.height, W: p.width, H: p.height}
+func (pipe *Pipe) paint(r *sdl.Renderer) error {
+	rect := &sdl.Rect{X: pipe.x, Y: 600 - pipe.height, W: pipe.width, H: pipe.height}
 	flip := sdl.FLIP_NONE
-	if p.rotated {
+	if pipe.rotated {
 		rect.Y = 0
 		flip = sdl.FLIP_VERTICAL
 	}
 
-	if err := r.CopyEx(p.texture, nil, rect, 0, nil, flip); err != nil {
-		return fmt.Errorf("background not copy: %v", err)
+	if err := r.CopyEx(pipe.texture, nil, rect, 0, nil, flip); err != nil {
+		return fmt.Errorf("background not copy: %s", err)
 	}
 
 	return nil
 }
 
 func (pipes *Pipes) UpdatePipes() {
-	var remaining []*Pipe
+	var totalPipes []*Pipe
 	for _, p := range pipes.pipes {
 		p.x -= 2
 		if p.x+p.width > 0 {
-			remaining = append(remaining, p)
+			totalPipes = append(totalPipes, p)
 		}
 	}
-	pipes.pipes = remaining
+
+	pipes.pipes = totalPipes
 }
 
-func (p *Pipe) UpdatePipe() {
-	p.x -= 2
+func (pipe *Pipe) UpdatePipe() {
+	pipe.x -= 2
 }
 
 func (pipes *Pipes) Destroy() {
@@ -97,4 +97,28 @@ func (pipes *Pipes) Destroy() {
 
 func (pipes *Pipes) RestartPipes() {
 	pipes.pipes = nil
+}
+
+func (pipes *Pipes) CheckCollisions(bird *Bird) {
+	for _, p := range pipes.pipes {
+		p.checkCollision(bird)
+	}
+}
+
+func (pipe *Pipe) checkCollision(bird *Bird) {
+	if bird.x > pipe.x && bird.x < pipe.width+bird.width {
+		//Bird passes the pipe
+
+	}
+	if bird.x > pipe.x && pipe.x < bird.width {
+		//TODO: fix the vertical checking
+		if !pipe.rotated && bird.y < pipe.height {
+			//bird.dead = true
+		}
+
+		if pipe.rotated && bird.y > pipe.height {
+			//bird.dead = true
+		}
+
+	}
 }
