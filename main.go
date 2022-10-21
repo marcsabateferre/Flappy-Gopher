@@ -38,13 +38,13 @@ func run() error {
 	defer s.Destroy()
 
 	events := make(chan sdl.Event)
-	errc := s.Run(events, r)
+	errorchan := s.Run(events, r)
 
 	runtime.LockOSThread()
 	for {
 		select {
 		case events <- sdl.WaitEvent():
-		case err := <-errc:
+		case err := <-errorchan:
 			return err
 		}
 	}

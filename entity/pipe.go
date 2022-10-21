@@ -88,3 +88,13 @@ func (pipes *Pipes) UpdatePipes() {
 func (p *Pipe) UpdatePipe() {
 	p.x -= 2
 }
+
+func (pipes *Pipes) Destroy() {
+	for _, p := range pipes.pipes {
+		p.texture.Destroy()
+	}
+}
+
+func (pipes *Pipes) RestartPipes() {
+	pipes.pipes = nil
+}

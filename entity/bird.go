@@ -66,13 +66,16 @@ func (b *Bird) IsDead() bool {
 	return b.dead
 }
 
-func (b *Bird) RestartBird() {
+func (b *Bird) RestartBird() bool {
 	if b.dead {
 		b.y = 300
 		b.speed = 0
 		b.dead = false
 		b.UpdateBird()
+		return true
 	}
+
+	return false
 }
 
 func (b *Bird) Jump() {

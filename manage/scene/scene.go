@@ -47,10 +47,10 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 }
 
 func (s *scene) Run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
-	errc := make(chan error)
+	errorchan := make(chan error)
 
 	go func() {
-		defer close(errc)
+		defer close(errorchan)
 		tick := time.Tick(10 * time.Millisecond)
 		for {
 			select {
@@ -60,15 +60,18 @@ func (s *scene) Run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 				}
 			case <-tick:
 				s.updateScene()
-				s.birdEntity.RestartBird()
+				restartedBird := s.birdEntity.RestartBird()
+				if restartedBird {
+					s.pipeEntity.RestartPipes()
+				}
 				if err := s.paint(r); err != nil {
-					errc <- err
+					errorchan <- err
 				}
 			}
 		}
 	}()
 
-	return errc
+	return errorchan
 }
 
 func (s *scene) paint(r *sdl.Renderer) error {
@@ -91,6 +94,7 @@ func (s *scene) paint(r *sdl.Renderer) error {
 
 func (s *scene) Destroy() {
 	s.bg.Destroy()
+	s.pipeEntity.Destroy()
 }
 
 func (s *scene) updateScene() {
