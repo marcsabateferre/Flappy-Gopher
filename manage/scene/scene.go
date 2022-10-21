@@ -11,7 +11,7 @@ import (
 type scene struct {
 	bg         *sdl.Texture
 	birdEntity *entity.Bird
-	pipeEntity *entity.Pipe
+	pipeEntity *entity.Pipes
 }
 
 func CreateScene(r *sdl.Renderer) (*scene, error) {
@@ -20,18 +20,18 @@ func CreateScene(r *sdl.Renderer) (*scene, error) {
 		return nil, fmt.Errorf("could not load background image: %v", error)
 	}
 	var bird *entity.Bird
-	var pipe *entity.Pipe
+	var pipes *entity.Pipes
 
 	bird, error = entity.CreateBird(r)
 	if error != nil {
 		return nil, error
 	}
 
-	pipe, error = entity.CreatePipe(r)
+	pipes, error = entity.CreatePipes(r)
 	if error != nil {
 		return nil, error
 	}
-	return &scene{bg: bg, birdEntity: bird, pipeEntity: pipe}, nil
+	return &scene{bg: bg, birdEntity: bird, pipeEntity: pipes}, nil
 }
 
 func (s *scene) handleEvent(event sdl.Event) bool {
@@ -95,4 +95,5 @@ func (s *scene) Destroy() {
 
 func (s *scene) updateScene() {
 	s.birdEntity.UpdateBird()
+	s.pipeEntity.UpdatePipes()
 }
